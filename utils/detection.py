@@ -1,15 +1,18 @@
 from typing import Any, Optional, Tuple
 
 from .mappings import CLASS_EN_AR
-from .audio import get_audio_file_for_english_word
+from .audio import get_audio_file
 
 
-def get_arabic_and_audio_for_result(
+def get_detection_word_and_audio(
     result: Any, model: Any
 ) -> Tuple[Optional[str], Optional[str]]:
-    """Given a single YOLO result, return (arabic_word, english_audio_file_path).
-
+    """
+    Given a single YOLO result, return (arabic_word, english_audio_file_path).
     If no mapped class is detected, both values are None.
+    :param result: The YOLO result object.
+    :param model: The YOLO model with class names.
+    :return: A tuple of (arabic_word, audio_file_path) or (None, None).
     """
 
     if result is None or getattr(result, "boxes", None) is None:
@@ -28,5 +31,5 @@ def get_arabic_and_audio_for_result(
     if not arabic_word:
         return None, None
 
-    audio_file = get_audio_file_for_english_word(english_label)
+    audio_file = get_audio_file(english_label)
     return arabic_word, audio_file

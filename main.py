@@ -3,9 +3,9 @@ import cv2
 import torch
 
 from utils import (
-    generate_all_class_audio_files,
-    get_arabic_and_audio_for_result,
-    play_audio_file,
+    generate_audio_files,
+    get_detection_word_and_audio,
+    speak,
 )
 
 
@@ -27,27 +27,14 @@ def run_detection() -> None:
         if not ret:
             break
 
-        results = model(frame)
+        results = model(frame, verbose=False)
         yolo_result = results[0]
         annotated = yolo_result.plot()
 
-        arabic_word, audio_file = get_arabic_and_audio_for_result(yolo_result, model)
-
-        if arabic_word:
-            cv2.putText(
-                annotated,
-                arabic_word,
-                (20, 40),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1.2,
-                (0, 255, 0),
-                2,
-                cv2.LINE_AA,
-            )
+        arabic_word, audio_file = get_detection_word_and_audio(yolo_result, model)
 
         if arabic_word and audio_file and arabic_word != last_word:
-            print(f"Detected word: {arabic_word} | Audio file: {audio_file}")
-            play_audio_file(audio_file)
+            speak(audio_file)
             last_word = arabic_word
 
         cv2.imshow("YOLO Detection", annotated)
@@ -60,6 +47,5 @@ def run_detection() -> None:
 
 
 if __name__ == "__main__":
-    # Generate the Arabic audio files once (idempotent) and then run detection
-    generate_all_class_audio_files(model)
+    generate_audio_files(model)
     run_detection()
