@@ -2,3 +2,5 @@ ultralytics
 torch
 torchvision
 opencv-python
+gTTS
+pygame
