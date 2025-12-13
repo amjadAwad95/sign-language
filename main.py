@@ -1,51 +1,80 @@
-from ultralytics import YOLO
 import cv2
+import gradio as gr
+import numpy as np
 import torch
+from ultralytics import YOLO
 
-from utils import (
-    generate_audio_files,
-    get_detection_word_and_audio,
-    speak,
-)
+from utils import get_detection_word_and_audio
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Using device:", device)
 model = YOLO("model.pt").to(device)
 
+last_word: str | None = None
 
-def run_detection() -> None:
-    cap = cv2.VideoCapture(0)
 
-    if not cap.isOpened():
-        print("Could not open camera")
-        return
+def detection(frame: np.ndarray, conf_threshold: float):
+    global last_word
 
-    last_word = None
+    if frame is None:
+        return None, "", None
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+    frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    results = model(frame_bgr, conf=conf_threshold, verbose=False, imgsz=416)
+    result = results[0]
 
-        results = model(frame, verbose=False)
-        yolo_result = results[0]
-        annotated = yolo_result.plot()
+    annotated_bgr = result.plot()
+    annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
 
-        arabic_word, audio_file = get_detection_word_and_audio(yolo_result, model)
+    arabic_word, audio_file = get_detection_word_and_audio(result, model)
+    next_audio = None
+    if arabic_word and arabic_word != last_word:
+        last_word = arabic_word
+        next_audio = audio_file
 
-        if arabic_word and audio_file and arabic_word != last_word:
-            speak(audio_file)
-            last_word = arabic_word
+    return annotated_rgb, arabic_word or last_word or "", next_audio
 
-        cv2.imshow("YOLO Detection", annotated)
 
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+def launch_app() -> None:
+    with gr.Blocks(title="Sign Language Live") as demo:
+        gr.Markdown("# Live Sign Language Detection\nWebcam streaming with on-frame annotations.")
 
-    cap.release()
-    cv2.destroyAllWindows()
+        with gr.Row():
+            cam = gr.Image(
+                sources="webcam",
+                streaming=True,
+                type="numpy",
+                label="Camera",
+                height=240,
+                width=320,
+            )
+            annotated = gr.Image(
+                type="numpy",
+                label="Detections",
+                height=240,
+                width=320,
+            )
+
+        with gr.Row():
+            word = gr.Textbox(label="Detected Word", interactive=False)
+            audio = gr.Audio(label="Spoken Arabic", autoplay=True, type="filepath")
+            conf_threshold = gr.Slider(
+                label="Confidence Threshold",
+                minimum=0.0,
+                maximum=1.0,
+                step=0.05,
+                value=0.30,
+            )
+
+        cam.stream(
+            fn=detection,
+            inputs=[cam, conf_threshold],
+            outputs=[annotated, word, audio],
+        )
+
+    demo.launch(share=True)
 
 
 if __name__ == "__main__":
-    generate_audio_files(model)
-    run_detection()
+    launch_app()
