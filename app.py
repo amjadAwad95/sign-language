@@ -7,10 +7,10 @@ from utils import (
     speak,
 )
 
+MODEL_PATH = "model/model.onnx"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model = YOLO("model.onnx")
-
+model = YOLO(MODEL_PATH)
 
 def run_detection() -> None:
     cap = cv2.VideoCapture(0)
