@@ -2,10 +2,7 @@
 
 An AI-powered real-time Arabic Sign Language detection system using YOLOv11. This project can detect Arabic sign language gestures through a camera feed and provide both visual feedback and Arabic audio pronunciation of the detected words.
 
-![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
-![YOLO](https://img.shields.io/badge/YOLO-v11-green.svg)
-![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-red.svg)
-![Gradio](https://img.shields.io/badge/Gradio-Web%20Interface-orange.svg)
+[![Report](https://img.shields.io/badge/YOLOV11-gray?logo=weightsandbiases&logoColor=yellow)](https://wandb.ai/IOT-SL/arabic-sl-yolov11/reports/Arabic-Sign-Language-Detection--VmlldzoxNTQ1MjAxNA)
 
 ## 🌟 Features
 
