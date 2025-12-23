@@ -42,8 +42,8 @@ The model currently recognizes 13 common Arabic sign language gestures:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/arabic-sign-language.git
-   cd arabic-sign-language
+   git clone https://github.com/amjadAwad95/sign-language.git
+   cd sign-language
    ```
 
 2. **Install dependencies**
@@ -64,29 +64,6 @@ The model currently recognizes 13 common Arabic sign language gestures:
    python app.py
    ```
    Press 'q' to quit the camera feed.
-
-## 🏗️ Project Structure
-
-```
-arabic-sign-language/
-├── app.py                          # Terminal-based detection app
-├── main.py                         # Gradio web interface app
-├── requirements.txt                # Python dependencies
-├── sign_language_model_train.ipynb # Model training notebook
-├── test.py                         # Testing utilities
-├── test.ipynb                      # Testing notebook
-├── README.md                       # Project documentation
-├── model/                          # Trained models
-│   ├── model.onnx                  # ONNX format model (production)
-│   └── model.pt                    # PyTorch format model
-├── audio/                          # Generated audio files
-├── utils/                          # Utility modules
-│   ├── __init__.py
-│   ├── audio.py                    # Text-to-speech functionality
-│   ├── detection.py                # Detection logic
-│   └── mappings.py                 # English-Arabic translations
-└── data.yaml                       # YOLO training configuration
-```
 
 ## 🛠️ Technical Details
 
@@ -194,13 +171,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Arabic Sign Language** community for datasets and guidance
 - **Google Text-to-Speech** for Arabic audio generation
 - **Gradio** team for the excellent web interface framework
-
-## 📞 Contact
-
-- GitHub: [@your-username](https://github.com/your-username)
-- Email: your.email@example.com
-- LinkedIn: [Your Name](https://linkedin.com/in/your-profile)
-
 ---
 
 Made with ❤️ for the Arabic Sign Language community
