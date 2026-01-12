@@ -1,16 +1,17 @@
-from ultralytics import YOLO
 import cv2
 import torch
-
-from utils import (
-    get_detection_word_and_audio,
-    speak,
-)
+from ultralytics import YOLO
+from speakers import PygameSpeaker
+from utils import get_detection_word
 
 MODEL_PATH = "model/model.onnx"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = YOLO(MODEL_PATH)
+
+pygame_speaker = PygameSpeaker()
+pygame_speaker.initialize(model=model)
+
 
 def run_detection() -> None:
     cap = cv2.VideoCapture(0)
@@ -30,10 +31,10 @@ def run_detection() -> None:
         yolo_result = results[0]
         annotated = yolo_result.plot()
 
-        arabic_word, audio_file = get_detection_word_and_audio(yolo_result, model)
+        arabic_word = get_detection_word(yolo_result, model)
 
-        if arabic_word and audio_file and arabic_word != last_word:
-            speak(audio_file)
+        if arabic_word and arabic_word != last_word:
+            pygame_speaker.speak(arabic_word)
             last_word = arabic_word
 
         cv2.imshow("YOLO Detection", annotated)
