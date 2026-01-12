@@ -31,12 +31,11 @@ def run_detection() -> None:
         yolo_result = results[0]
         annotated = yolo_result.plot()
 
-        arabic_word = get_detection_word(yolo_result, model)
+        english_word = get_detection_word(yolo_result, model)
 
-        if arabic_word and arabic_word != last_word:
-            pygame_speaker.speak(arabic_word)
-            last_word = arabic_word
-
+        if english_word and english_word != last_word:
+            pygame_speaker.speak(english_word)
+            last_word = english_word
         cv2.imshow("YOLO Detection", annotated)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
