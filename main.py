@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import time
 import cv2
 import gradio as gr
@@ -9,14 +10,13 @@ import tempfile
 import shutil
 from collections import deque
 from typing import Optional
-
 from ultralytics import YOLO
-from utils import get_detection_word_and_audio
+from utils import get_detection_word
 
 # =============================
 # CONFIG
 # =============================
-MODEL_PATH = "model.onnx"
+MODEL_PATH = "model/model.onnx"
 
 # Keep camera + inference same size to avoid extra resizing overhead
 UI_SIZE = 320  # Camera displayed size
@@ -177,25 +177,27 @@ def inference_loop():
         annotated_bgr = draw_boxes_fast(frame_bgr, result)
         annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
 
-        arabic_word, audio_file = get_detection_word_and_audio(result, model)
+        english_label = get_detection_word(result, model)
+        audio_path = (Path(__file__).resolve().parent / "audio").resolve()
+        audio_file = audio_path / f"{english_label}.mp3"
 
         now = time.time()
         new_audio: Optional[str] = None
         display_word = _last_word or ""
 
-        if arabic_word:
-            display_word = arabic_word
+        if english_label:
+            display_word = english_label
 
             # cooldown + change gate
             if (
-                arabic_word != _last_word
+                english_label != _last_word
                 and (now - _last_audio_time) >= AUDIO_COOLDOWN_SEC
             ):
-                _last_word = arabic_word
+                _last_word = english_label
                 _last_audio_time = now
 
-                if audio_file:
-                    new_audio = cache_bust_audio(audio_file)
+                if audio_file.exists():
+                    new_audio = cache_bust_audio(str(audio_file))
 
         with lock:
             latest_annotated_rgb = annotated_rgb
